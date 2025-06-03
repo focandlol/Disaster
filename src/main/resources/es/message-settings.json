@@ -1,0 +1,72 @@
+{
+  "analysis": {
+    "tokenizer": {
+      "custom_nori_tokenizer": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "mixed",
+        "user_dictionary_rules": [
+          "해운대구,해운/Compound,대/Compound,구/Compound"
+        ]
+      }
+    },
+    "filter": {
+      "custom_sido_stop_filter": {
+        "type": "stop",
+        "stopwords": ["시", "도", "자치", "특별", "광역", "광역시", "특별자치시", "특별자치도"]
+      },
+      "custom_sigungu_stop_filter": {
+        "type": "stop",
+        "stopwords": ["시", "군", "구"]
+      }
+    },
+    "analyzer": {
+      "custom_category": {
+        "char_filter": [],
+        "tokenizer": "custom_nori_tokenizer",
+        "filter": ["nori_part_of_speech", "nori_readingform", "lowercase"]
+      },
+      "custom_text": {
+        "char_filter": [],
+        "tokenizer": "custom_nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase",
+          "custom_sido_stop_filter",
+          "custom_sigungu_stop_filter"
+        ]
+      },
+      "custom_region": {
+        "char_filter": [],
+        "tokenizer": "custom_nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase",
+          "custom_sido_stop_filter",
+          "custom_sigungu_stop_filter"
+        ]
+      },
+      "custom_regions_sido_nori": {
+        "char_filter": [],
+        "tokenizer": "custom_nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase",
+          "custom_sido_stop_filter"
+        ]
+      },
+      "custom_regions_sigungu_nori": {
+        "char_filter": [],
+        "tokenizer": "custom_nori_tokenizer",
+        "filter": [
+          "nori_part_of_speech",
+          "nori_readingform",
+          "lowercase",
+          "custom_sigungu_stop_filter"
+        ]
+      }
+    }
+  }
+}
