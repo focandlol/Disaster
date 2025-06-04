@@ -2,11 +2,7 @@
   "analysis": {
     "tokenizer": {
       "custom_nori_tokenizer": {
-        "type": "nori_tokenizer",
-        "decompound_mode": "mixed",
-        "user_dictionary_rules": [
-          "해운대구,해운/Compound,대/Compound,구/Compound"
-        ]
+        "type": "nori_tokenizer"
       }
     },
     "filter": {
