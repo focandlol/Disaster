@@ -1,5 +1,6 @@
 package focandlol.disaster.domain.es;
 
+import focandlol.disaster.domain.Message;
 import jakarta.persistence.Id;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -44,5 +45,28 @@ public class MessageDocument {
 
   @Field(type = FieldType.Date)
   private String registeredDate;
+
+  public static MessageDocument from(Message message,Set<Region> regions) {
+    return MessageDocument.builder()
+        .id(message.getSn())
+        .text(message.getText())
+        .region(message.getRegion())
+        .regions(regions)
+        .category(message.getCategory())
+        .occurrenceDate(message.getOccurrenceDate().toString())
+        .registeredDate(message.getCreatedDate().toString())
+        .build();
+  }
+
+  private static String safe(String value) {
+    if (value == null) {
+      return null;
+    }
+    // 모든 공백 제거 (유니코드 포함)
+    if (value.replaceAll("\\s+", "").isEmpty()) {
+      return null;
+    }
+    return value;
+  }
 
 }
