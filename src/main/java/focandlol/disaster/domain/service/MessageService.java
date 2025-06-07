@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregation;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
@@ -74,7 +75,8 @@ public class MessageService {
         )
         .build();
 
-    SearchHits<MessageDocument> search = elasticsearchOperations.search(query, MessageDocument.class);
+    SearchHits<MessageDocument> search = elasticsearchOperations.search(query,
+        MessageDocument.class);
 
     ElasticsearchAggregations aggregations = (ElasticsearchAggregations) search.getAggregations();
 
@@ -97,7 +99,43 @@ public class MessageService {
 
   }
 
-  public List<AggregationDto> getSidoAggregation(String from, String to) throws IOException {
+  public List<AggregationDto> getSidoAggregation(String from, String to) {
+    Query query = NativeQuery.builder()
+        .withAggregation("regions_nested", Aggregation.of(a -> a
+                .nested(n -> n.path("regions"))
+                .aggregations("sido", Aggregation.of(ag -> ag
+                        .terms(t -> t
+                            .field("regions.sido.keyword")
+                            .size(100))
+                        .aggregations("reverse_sido", Aggregation.of(r -> r
+                            .reverseNested(rn -> rn))
+                        )
+                    )
+                )
+            )
+        ).build();
+
+    SearchHits<MessageDocument> search = elasticsearchOperations.search(query,
+        MessageDocument.class);
+
+    ElasticsearchAggregations aggregations = (ElasticsearchAggregations) search.getAggregations();
+
+    return aggregations.get("regions_nested").aggregation()
+        .getAggregate()
+        .nested()
+        .aggregations()
+        .get("sido")
+        .sterms()
+        .buckets()
+        .array()
+        .stream()
+        .map(
+            bk -> new AggregationDto(bk.key().stringValue(), bk.aggregations().get("reverse_sido").reverseNested()
+                .docCount()))
+        .collect(Collectors.toList());
+  }
+
+  public List<AggregationDto> getSido1Aggregation(String from, String to) throws IOException {
     SearchResponse<Void> response = client.search(sr -> sr
             .index("calamity-read")
             .aggregations("regions_nested", a -> a
@@ -124,7 +162,7 @@ public class MessageService {
         .collect(Collectors.toList());
   }
 
-  public List<AggregationDto> getCategoryAggregation(String from, String to) throws IOException {
+  public List<AggregationDto> getCategory1Aggregation(String from, String to) throws IOException {
     SearchResponse<Void> response = client.search(sr -> sr
             .index("calamity-read")
             .query(q -> q
@@ -148,6 +186,32 @@ public class MessageService {
         .array()
         .stream()
         .map(a -> new AggregationDto(a.key().stringValue(), a.docCount()))
+        .collect(Collectors.toList());
+  }
+
+  public List<AggregationDto> getCategoryAggregation(String from, String to){
+    Query query = NativeQuery.builder()
+        .withAggregation("category_agg", Aggregation.of(a -> a
+                .terms(t -> t
+                    .field("category.keyword")
+                    .size(100)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            )
+        ).build();
+
+    SearchHits<MessageDocument> search = elasticsearchOperations.search(query,
+        MessageDocument.class);
+
+    ElasticsearchAggregations aggregations = (ElasticsearchAggregations) search.getAggregations();
+
+    return aggregations.get("category_agg").aggregation()
+        .getAggregate()
+        .sterms()
+        .buckets()
+        .array()
+        .stream()
+        .map(bk -> new AggregationDto(bk.key().stringValue(), bk.docCount()))
         .collect(Collectors.toList());
   }
 
