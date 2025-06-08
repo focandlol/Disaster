@@ -5,7 +5,6 @@ import focandlol.disaster.dto.AggregationDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +30,16 @@ public class MessageController {
   @GetMapping("/category_aggregation")
   public ResponseEntity<List<AggregationDto>> getCategoryAggregation(@RequestParam String from, @RequestParam String to) {
     return ResponseEntity.ok(messageService.getCategoryAggregation(from, to));
+  }
 
+  @GetMapping("/year_aggregation")
+  public ResponseEntity<List<AggregationDto>> getYearAggregation(@RequestParam String year){
+    return ResponseEntity.ok(messageService.getYearAggregation(year));
+  }
+
+  @GetMapping("/month_aggregation")
+  public ResponseEntity<List<AggregationDto>> getMonthAggregation(@RequestParam String yearMonth){
+    return ResponseEntity.ok(messageService.getMonthAggregation(yearMonth));
   }
 
 }

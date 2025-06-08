@@ -130,8 +130,9 @@ public class MessageService {
         .array()
         .stream()
         .map(
-            bk -> new AggregationDto(bk.key().stringValue(), bk.aggregations().get("reverse_sido").reverseNested()
-                .docCount()))
+            bk -> new AggregationDto(bk.key().stringValue(),
+                bk.aggregations().get("reverse_sido").reverseNested()
+                    .docCount()))
         .collect(Collectors.toList());
   }
 
@@ -189,7 +190,7 @@ public class MessageService {
         .collect(Collectors.toList());
   }
 
-  public List<AggregationDto> getCategoryAggregation(String from, String to){
+  public List<AggregationDto> getCategoryAggregation(String from, String to) {
     Query query = NativeQuery.builder()
         .withAggregation("category_agg", Aggregation.of(a -> a
                 .terms(t -> t
@@ -215,7 +216,7 @@ public class MessageService {
         .collect(Collectors.toList());
   }
 
-  public List<AggregationDto> getYearAggregation(String year) throws IOException {
+  public List<AggregationDto> getYear1Aggregation(String year) throws IOException {
     SearchResponse<Void> response = client.search(sr -> sr
             .index("calamity-read")
             .size(0)
@@ -245,7 +246,38 @@ public class MessageService {
         .collect(Collectors.toList());
   }
 
-  public List<AggregationDto> getMonthAggregation(String yearMonth) throws IOException {
+  public List<AggregationDto> getYearAggregation(String year) {
+    Query query = NativeQuery.builder()
+        .withAggregation("year_agg", Aggregation.of(a -> a
+                .dateHistogram(h -> h
+                    .field("createdAt")
+                    .calendarInterval(CalendarInterval.Month)
+                    .format("yyyy-MM")
+                    .minDocCount(1)
+                    .extendedBounds(eb -> eb
+                        .min(FieldDateMath.of(f -> f.expr(year + "-01")))
+                        .max(FieldDateMath.of(f -> f.expr(year + "-12")))
+                    )
+                )
+            )
+        ).build();
+
+    SearchHits<MessageDocument> search = elasticsearchOperations.search(query,
+        MessageDocument.class);
+
+    ElasticsearchAggregations aggregations = (ElasticsearchAggregations) search.getAggregations();
+
+    return aggregations.get("year_agg").aggregation()
+        .getAggregate()
+        .dateHistogram()
+        .buckets()
+        .array()
+        .stream()
+        .map(bk -> new AggregationDto(bk.keyAsString(), bk.docCount()))
+        .collect(Collectors.toList());
+  }
+
+  public List<AggregationDto> getMonth1Aggregation(String yearMonth) throws IOException {
     String minDate = yearMonth + "-01";
     String maxDate = LocalDate.parse(minDate).with(TemporalAdjusters.lastDayOfMonth()).toString();
 
@@ -275,6 +307,44 @@ public class MessageService {
         .array()
         .stream()
         .map(m -> new AggregationDto(m.keyAsString(), m.docCount()))
+        .collect(Collectors.toList());
+  }
+
+  public List<AggregationDto> getMonthAggregation(String yearMonth) {
+    String minDate = yearMonth + "-01";
+    String maxDate = LocalDate.parse(minDate).with(TemporalAdjusters.lastDayOfMonth()).toString();
+
+    Query query = NativeQuery.builder()
+        .withQuery(q -> q
+            .range(r -> r
+                .field("createdAt")
+                .gte(JsonData.of(minDate))
+                .lte(JsonData.of(maxDate))))
+        .withAggregation("month_agg", Aggregation.of(a -> a
+                .dateHistogram(h -> h
+                    .field("createdAt")
+                    .calendarInterval(CalendarInterval.Month)
+                    .minDocCount(0)
+                    .extendedBounds(eb -> eb
+                        .min(FieldDateMath.of(f -> f.expr(minDate)))
+                        .max(FieldDateMath.of(f -> f.expr(maxDate)))
+                    )
+                )
+            )
+        ).build();
+
+    SearchHits<MessageDocument> search = elasticsearchOperations.search(query,
+        MessageDocument.class);
+
+    ElasticsearchAggregations aggregations = (ElasticsearchAggregations) search.getAggregations();
+
+    return aggregations.get("month_agg")
+        .aggregation().getAggregate()
+        .dateHistogram()
+        .buckets()
+        .array()
+        .stream()
+        .map(bk -> new AggregationDto(bk.keyAsString(), bk.docCount()))
         .collect(Collectors.toList());
   }
 }
