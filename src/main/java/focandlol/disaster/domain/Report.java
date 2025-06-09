@@ -26,6 +26,7 @@ public class Report extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
   private String title;
 
   @Column(columnDefinition = "TEXT")
@@ -35,6 +36,7 @@ public class Report extends BaseEntity {
 
   private String jibunAddress;
 
+  @Column(nullable = false)
   private String category;
 
   @ManyToOne(fetch = FetchType.LAZY)
