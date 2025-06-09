@@ -2,6 +2,7 @@ package focandlol.disaster.domain.es;
 
 import focandlol.disaster.domain.Message;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,10 +42,10 @@ public class MessageDocument {
   private String category;
 
   @Field(type = FieldType.Date)
-  private String occurrenceDate;
+  private LocalDateTime occurrenceDate;
 
   @Field(type = FieldType.Date)
-  private String registeredDate;
+  private LocalDateTime registeredDate;
 
   public static MessageDocument from(Message message,Set<Region> regions) {
     return MessageDocument.builder()
@@ -53,8 +54,8 @@ public class MessageDocument {
         .region(message.getRegion())
         .regions(regions)
         .category(message.getCategory())
-        .occurrenceDate(message.getOccurrenceDate().toString())
-        .registeredDate(message.getCreatedDate().toString())
+        .occurrenceDate(message.getOccurrenceDate())
+        .registeredDate(message.getCreatedDate())
         .build();
   }
 
