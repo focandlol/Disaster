@@ -1,6 +1,6 @@
 package focandlol.disaster.controller;
 
-import focandlol.disaster.domain.service.MessageService;
+import focandlol.disaster.service.MessageService;
 import focandlol.disaster.dto.AggregationDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

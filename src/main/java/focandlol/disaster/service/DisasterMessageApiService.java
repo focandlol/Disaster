@@ -1,4 +1,4 @@
-package focandlol.disaster.domain.service;
+package focandlol.disaster.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

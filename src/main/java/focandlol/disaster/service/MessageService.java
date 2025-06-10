@@ -1,4 +1,4 @@
-package focandlol.disaster.domain.service;
+package focandlol.disaster.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;

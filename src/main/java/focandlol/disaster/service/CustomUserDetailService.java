@@ -1,4 +1,4 @@
-package focandlol.disaster.domain.service;
+package focandlol.disaster.service;
 
 import focandlol.disaster.domain.Member;
 import focandlol.disaster.dto.CustomUserDetails;
