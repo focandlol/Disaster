@@ -24,12 +24,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
   private final ObjectMapper objectMapper;
+  private final JwtProvider jwtProvider;
 
   public CustomLoginFilter(String filterProcessUrl, AuthenticationManager authenticationManager,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper, JwtProvider jwtProvider) {
     this.setFilterProcessesUrl(filterProcessUrl);
     this.setAuthenticationManager(authenticationManager);
     this.objectMapper = objectMapper;
+    this.jwtProvider = jwtProvider;
   }
 
 
@@ -78,16 +80,9 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
 
-    String username = userDetails.getUsername();
+    String token = jwtProvider.createJwt(userDetails);
 
-//    Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities();
-//    List<String> roles = authorities.stream()
-//        .map(grantedAuthority -> grantedAuthority.getAuthority())
-//        .collect(Collectors.toList());
-//
-//    String token = jwtUtil.createJwt(userDetails.getUserDetailsDto().getId(), username, roles);
-//
-//    response.addHeader("Authorization", "Bearer " + token);
+    response.addHeader("Authorization", "Bearer " + token);
     log.info("login com");
   }
 
