@@ -1,6 +1,7 @@
 package focandlol.disaster.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import focandlol.disaster.security.CustomAuthenticationEntryPoint;
 import focandlol.disaster.security.CustomLoginFilter;
 import focandlol.disaster.security.JwtFilter;
 import focandlol.disaster.security.JwtProvider;
@@ -26,6 +27,7 @@ public class SecurityConfig {
   private final ObjectMapper objectMapper;
   private final AuthenticationConfiguration authenticationConfiguration;
   private final JwtProvider jwtProvider;
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,6 +47,8 @@ public class SecurityConfig {
 
     http.sessionManagement((session) -> session
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+    http.exceptionHandling(handler -> handler.authenticationEntryPoint(customAuthenticationEntryPoint));
 
     return http.build();
   }
