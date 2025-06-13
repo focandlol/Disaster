@@ -1,8 +1,12 @@
 package focandlol.disaster.service;
 
+import static focandlol.disaster.exception.ErrorCode.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import focandlol.disaster.domain.Message;
+import focandlol.disaster.exception.CustomException;
+import focandlol.disaster.exception.ErrorCode;
 import focandlol.disaster.repository.MessageRepository;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -71,7 +75,7 @@ public class DisasterMessageApiService {
       ResponseEntity<String> response = restTemplate.getForEntity(url.toString(), String.class);
       return response.getBody();
     } catch (Exception e) {
-      throw new RuntimeException("API 호출 실패", e);
+      throw new CustomException(API_CALL_FAILED,e);
     }
   }
 
@@ -80,13 +84,13 @@ public class DisasterMessageApiService {
       JsonNode root = mapper.readTree(json);
       return root.path("body");
     } catch (Exception e) {
-      throw new RuntimeException("JSON 파싱 실패", e);
+      throw new CustomException(JSON_PARSE_FAILED,e);
     }
   }
 
   private String getStartDate(){
     Message message = messageRepository.findTopByOrderByCreatedDateDesc()
-        .orElseThrow(() -> new RuntimeException());
+        .orElseThrow(() -> new CustomException(RECENT_DATE_NOT_FOUND, new Exception()));
 
     LocalDateTime lastCreatedDate = message.getCreatedDate();
 

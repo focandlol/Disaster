@@ -4,18 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import focandlol.disaster.domain.Message;
 import focandlol.disaster.domain.es.MessageDocument;
 import focandlol.disaster.domain.es.Region;
-import focandlol.disaster.domain.service.DisasterMessageApiService;
-import focandlol.disaster.domain.service.MessageUtil;
+import focandlol.disaster.service.DisasterMessageApiService;
+import focandlol.disaster.service.MessageUtil;
 import focandlol.disaster.repository.MessageDocumentRepository;
 import focandlol.disaster.repository.MessageRepository;
-import jakarta.json.Json;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,7 +25,7 @@ public class MessageScheduler {
   private final MessageRepository messageRepository;
   private final MessageDocumentRepository messageDocumentRepository;
 
-  @Scheduled(fixedRate = 120000)
+  //@Scheduled(fixedRate = 120000)
   public void messageSchedule(){
     List<JsonNode> disasterMessageApi = disasterMessageApiService.getDisasterMessageApi();
 
