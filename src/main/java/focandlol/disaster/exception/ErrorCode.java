@@ -22,6 +22,7 @@ public enum ErrorCode {
   REPORT_NOT_FOUND("존재하지 않는 제보입니다", BAD_REQUEST),
   MEMBER_NOT_FOUND("존재하지 않는 멤버입니다", BAD_REQUEST),
   COMMENT_NOT_FOUND("존재하지 않는 댓글입니다",BAD_REQUEST),
+  ALREADY_EXISTS_EMAIL("이미 존재하는 이메일입니다", BAD_REQUEST),
   ANOTHER_MEMBER("다른 멤버입니다", BAD_REQUEST),
   RECENT_DATE_NOT_FOUND("최근 날짜가 존재하지 않습니다",HttpStatus.INTERNAL_SERVER_ERROR);
 
